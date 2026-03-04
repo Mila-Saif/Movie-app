@@ -1,32 +1,56 @@
 import { getMovies } from "@/lib/tmdb";
+import { Card, CardContent } from "@/components/ui/card";
+import { Star } from "lucide-react"; 
 
 export default async function Home() {
-  let movies = [];
-
-  try {
-    const data = await getMovies("/trending/movie/day");
-    movies = data.results || []; 
-  } catch (error) {
-    console.error("Fetch failed:", error);
-  }
+  const data = await getMovies("/trending/movie/day");
+  const movies = data.results || [];
 
   return (
-    <div>
-      <h1 className="text-4xl font-bold mb-6">Trending Movies</h1>
+    <div className="space-y-8">
+      <h2 className="text-3xl font-bold tracking-tight text-foreground">
+        Trending Today
+      </h2>
       
-      {movies.length === 0 ? (
-        <div className="p-4 bg-red-100 text-red-800 rounded">
-          No movies found today.
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {movies.map((movie: any) => (
-            <div key={movie.id} className="border p-2 rounded-lg shadow-sm">
-              <p className="font-semibold">{movie.title}</p>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        {movies.map((movie: any) => {
+          const year = movie.release_date ? new Date(movie.release_date).getFullYear() : "N/A";
+          
+          const rating = movie.vote_average ? movie.vote_average.toFixed(1) : "NR";
+
+          return (
+            <Card 
+              key={movie.id} 
+              className="group overflow-hidden border-0 bg-secondary/20 hover:bg-secondary/40 transition-colors duration-300 cursor-pointer"
+            >
+              {/* image posters */}
+              <div className="relative aspect-2/3 overflow-hidden">
+                <img 
+                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
+                  alt={movie.title} 
+                  
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                
+                <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1">
+                  <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                  {rating}
+                </div>
+              </div>
+
+             
+              <CardContent className="p-4 space-y-1">
+                <h3 className="font-semibold truncate text-foreground" title={movie.title}>
+                  {movie.title}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {year}
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 }
