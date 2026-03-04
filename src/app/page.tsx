@@ -11,7 +11,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="p-10">
+    <div>
       <h1 className="text-4xl font-bold mb-6">Trending Movies</h1>
       
       {movies.length === 0 ? (
@@ -27,6 +27,6 @@ export default async function Home() {
           ))}
         </div>
       )}
-    </main>
+    </div>
   );
 }
