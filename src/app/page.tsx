@@ -1,7 +1,10 @@
 import { getMovies } from "@/lib/tmdb";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star } from "lucide-react"; 
+import { Star, ArrowRight } from "lucide-react"; 
 import Hero from "@/components/Hero";
+import Link from "next/link";
+import { Button } from  "@/components/ui/button"
+
 
 export default async function Home() {
   const data = await getMovies("/trending/movie/day");
@@ -52,9 +55,20 @@ export default async function Home() {
                 <h3 className="font-semibold truncate text-foreground" title={movie.title}>
                   {movie.title}
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm pb-0.5 text-muted-foreground">
                   {year}
                 </p>
+
+                <div className="p-4 pt-0">
+                  <Link href={`/movie/${movie.id}`}>
+                    <Button variant="outline" className="w-full rounded-md hover:bg-primary hover:text-bg-primary transition-colors">
+                      
+                      Details
+
+                      <ArrowRight className="w-4 h-4 mr-2" />
+                    </Button>
+                  </Link>
+                </div>
               </CardContent>
             </Card>
           );

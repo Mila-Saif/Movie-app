@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import {  Star } from "lucide-react";
 import Autoplay from "embla-carousel-autoplay";
+import Link from "next/link"
 
 export default function Hero({ movies }: { movies: any[] }) {
   const [api, setApi] = useState<CarouselApi>();
@@ -62,10 +63,14 @@ export default function Hero({ movies }: { movies: any[] }) {
                   </p>
 
                   <div className="flex items-center gap-4 pt-6">
+                  <Link href={`/movie/${movie.id}`}>
                     <Button size="lg" className="bg-primary hover:bg-primary/90 text-white rounded-full px-8 h-12">
                       
                       Details
                     </Button>
+                    
+                    </Link>
+
                     
                   </div>
                 </div>
