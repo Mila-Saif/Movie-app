@@ -1,16 +1,25 @@
 import { getMovies } from "@/lib/tmdb";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star } from "lucide-react"; 
+import Hero from "@/components/Hero";
 
 export default async function Home() {
   const data = await getMovies("/trending/movie/day");
+  const popularData = await getMovies("/movie/popular")
   const movies = data.results || [];
+  const popularMovies = popularData.results || [];
 
   return (
     <div className="space-y-8">
-      <h2 className="text-3xl font-bold tracking-tight text-foreground">
-        Trending Today
+      <Hero movies={popularMovies} />
+
+      <section className="space-y-6">
+        <h2 className="text-lg md:text-2xl font-bold tracking-tight text-foreground">
+        Trending Movies
+        
       </h2>
+    
+      
       
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
         {movies.map((movie: any) => {
@@ -51,6 +60,9 @@ export default async function Home() {
           );
         })}
       </div>
+        
+      </section>
+      
     </div>
   );
 }
