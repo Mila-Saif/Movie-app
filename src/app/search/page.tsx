@@ -3,9 +3,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Star } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import PaginationControls from "@/components/Pagination";
 
-export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q: string }> }) {
-  const { q } = await searchParams;
+export default async function SearchPage({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ q: string; page?: string }> 
+}) {
+  const { q, page } = await searchParams;;
+
+  const currentPage = Number(page) || 1;
 
 //   error 1
 
@@ -18,8 +25,19 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     );
   }
 
-  const data = await getMovies(`/search/movie?query=${encodeURIComponent(q)}&include_adult=false`);
-  const movies = data.results || [];
+
+
+const data = await getMovies(`/search/movie?query=${encodeURIComponent(q)}&include_adult=false&page=${currentPage}`);
+  const rawMovies = data.results || [];
+  const totalPages = data.total_pages || 1;
+
+  const moviesWithTrailers = await Promise.all(
+    rawMovies.map(async (movie: any) => {
+      const videoData = await getMovies(`/movie/${movie.id}/videos`);
+      const trailer = videoData.results?.find((vid: any) => vid.site === "YouTube" && vid.type === "Trailer");
+      return { ...movie, trailerKey: trailer?.key || null };
+    })
+  );
 
   return (
     <div className="space-y-8 pb-20">
@@ -28,14 +46,16 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       </h2>
       
       {/* error 2 */}
-      {movies.length === 0 ? (
+      {moviesWithTrailers.length === 0 ? (
         <div className="py-20 text-center">
           <p className="text-xl text-muted-foreground">No movies found matching "{q}".</p>
         </div>
       ) : (
+
+        <>
        
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {movies.map((movie: any) => {
+          {moviesWithTrailers.map((movie: any) => {
             const year = movie.release_date ? new Date(movie.release_date).getFullYear() : "N/A";
             const rating = movie.vote_average ? movie.vote_average.toFixed(1) : "NR";
 
@@ -78,7 +98,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   </div>
 
                   <Link href={`/movie/${movie.id}`} className="w-full mt-auto block">
-                    <Button variant="outline" className="w-full hover:bg-primary ghover:text-primary-foreground transition-colors">
+                    <Button variant="outline" className="w-full hover:bg-primary group-hover:text-primary-foreground transition-colors">
                       Details
                     </Button>
                   </Link>
@@ -87,6 +107,14 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             );
           })}
         </div>
+        {totalPages > 1 && (
+            <PaginationControls currentPage={currentPage} totalPages={totalPages} />
+          )}
+        </>
+
+        
+
+        
       )}
     </div>
   );

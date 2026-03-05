@@ -1,20 +1,32 @@
 import { getMovies } from "@/lib/tmdb";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, ArrowRight } from "lucide-react"; 
+import { Star } from "lucide-react"; 
 import Hero from "@/components/Hero";
 import Link from "next/link";
-import { Button } from  "@/components/ui/button"
+import { Button } from  "@/components/ui/button";
+import PaginationControls from "@/components/Pagination"
 
 
-export default async function Home() {
-  const data = await getMovies("/trending/movie/day");
+export default async function Home({ 
+
+ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ page?: string }> 
+}) {
+  const { page } = await searchParams;
+  const currentPage = Number(page) || 1;
+  
+  const data = await getMovies(`/trending/movie/day?page=${currentPage}`);
   const popularData = await getMovies("/movie/popular")
   const movies = data.results || [];
   const popularMovies = popularData.results || [];
+  const totalPages = data.total_pages || 1;
 
   return (
     <div className="space-y-8">
-      <Hero movies={popularMovies} />
+    {currentPage === 1 && <Hero movies={popularMovies} />}
+      
 
       <section className="space-y-6">
         <h2 className="text-lg md:text-2xl font-bold tracking-tight text-foreground">
@@ -72,6 +84,7 @@ export default async function Home() {
           );
         })}
       </div>
+      <PaginationControls currentPage={currentPage} totalPages={totalPages} />
         
       </section>
       
