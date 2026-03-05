@@ -21,8 +21,7 @@ export default function SearchBar() {
   };
 
   return (
-    <form onSubmit={handleSearch} className="flex w-full max-w-sm items-center space-x-2">
-      <Input
+    <form onSubmit={handleSearch} className="flex w-full max-w-sm mx-auto items-center space-x-2">      <Input
         type="text"
         placeholder="Search for a movie..."
         value={query}
