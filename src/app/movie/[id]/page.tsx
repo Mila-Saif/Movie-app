@@ -1,17 +1,22 @@
 import { getMovies } from "@/lib/tmdb";
 import { Star, Calendar, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import TrailerDialog from "@/components/TrailerDialog"; // Import our new component
 
 export default async function MovieDetails({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   
-  const movie = await getMovies(`/movie/${id}`);
+  const movie = await getMovies(`/movie/${id}?append_to_response=videos`);
 
-  const year = new Date(movie.release_date).getFullYear();
-  const rating = movie.vote_average.toFixed(1);
+  const year = movie.release_date ? new Date(movie.release_date).getFullYear() : "N/A";
+  const rating = movie.vote_average ? movie.vote_average.toFixed(1) : "NR";
+
+  const trailer = movie.videos?.results?.find(
+    (vid: any) => vid.site === "YouTube" && vid.type === "Trailer"
+  );
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-20">
       <div className="relative h-[40vh] md:h-[60vh] w-full">
         <img
           src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
@@ -33,7 +38,6 @@ export default async function MovieDetails({ params }: { params: Promise<{ id: s
             />
           </div>
 
-         
           <div className="flex flex-col justify-end pb-4 space-y-6">
             <div className="space-y-2 text-center md:text-left">
               <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
@@ -70,6 +74,8 @@ export default async function MovieDetails({ params }: { params: Promise<{ id: s
               <p className="text-muted-foreground leading-relaxed text-lg">
                 {movie.overview}
               </p>
+              
+              <TrailerDialog trailerKey={trailer?.key} />
             </div>
           </div>
         </div>
