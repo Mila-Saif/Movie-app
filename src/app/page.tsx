@@ -5,6 +5,7 @@ import Hero from "@/components/Hero";
 import Link from "next/link";
 import { Button } from  "@/components/ui/button";
 import PaginationControls from "@/components/Pagination"
+import GenreFilter from "@/components/Filter";
 
 
 export default async function Home({ 
@@ -12,25 +13,39 @@ export default async function Home({
  
   searchParams 
 }: { 
-  searchParams: Promise<{ page?: string }> 
-}) {
-  const { page } = await searchParams;
-  const currentPage = Number(page) || 1;
   
-  const data = await getMovies(`/trending/movie/day?page=${currentPage}`);
+  searchParams: Promise<{ page?: string; genre?: string }>
+
+}) {
+  const { page, genre } = await searchParams;
+  const currentPage = Number(page) || 1;
+
+  const genreData = await getMovies("/genre/movie/list");
+  const genres = genreData.genres || [];
+
+  const endpoint = genre 
+    ? `/discover/movie?with_genres=${genre}&page=${currentPage}` 
+    : `/trending/movie/day?page=${currentPage}`;
+  
+  const data = await getMovies(endpoint);
   const popularData = await getMovies("/movie/popular")
   const movies = data.results || [];
   const popularMovies = popularData.results || [];
   const totalPages = data.total_pages || 1;
 
+  const currentGenreName = genre 
+    ? genres.find((g: any) => g.id.toString() === genre)?.name 
+    : "Trending Today";
+
   return (
     <div className="space-y-8">
-    {currentPage === 1 && <Hero movies={popularMovies} />}
-      
+{currentPage === 1 && !genre && <Hero movies={popularMovies} />}      
 
       <section className="space-y-6">
+
+        <GenreFilter genres={genres} />
         <h2 className="text-lg md:text-2xl font-bold tracking-tight text-foreground">
-        Trending Movies
+        {currentGenreName}
         
       </h2>
     
@@ -74,7 +89,7 @@ export default async function Home({
                 <div className="p-4 pt-0">
 
                   <Link href={`/movie/${movie.id}`} className="w-full mt-auto block">
-                    <Button variant="outline" className="w-full hover:bg-primary ghover:text-primary-foreground transition-colors">
+                    <Button variant="outline" className="w-full hover:bg-primary hover:text-primary-foreground transition-colors">
                       Details
                     </Button>
                   </Link>
