@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
+import NProgress from "nprogress";
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
@@ -14,6 +15,7 @@ export default function SearchBar() {
     e.preventDefault();
     
     if (query.trim()) {
+      NProgress.start();
       router.push(`/search?q=${encodeURIComponent(query)}`);
     }
   };

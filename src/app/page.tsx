@@ -60,12 +60,10 @@ export default async function Home() {
                 </p>
 
                 <div className="p-4 pt-0">
-                  <Link href={`/movie/${movie.id}`}>
-                    <Button variant="outline" className="w-full rounded-md hover:bg-primary hover:text-bg-primary transition-colors">
-                      
-                      Details
 
-                      <ArrowRight className="w-4 h-4 mr-2" />
+                  <Link href={`/movie/${movie.id}`} className="w-full mt-auto block">
+                    <Button variant="outline" className="w-full hover:bg-primary ghover:text-primary-foreground transition-colors">
+                      Details
                     </Button>
                   </Link>
                 </div>
